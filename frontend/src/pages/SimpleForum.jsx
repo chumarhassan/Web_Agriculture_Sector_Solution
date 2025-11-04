@@ -13,7 +13,15 @@ const SimpleForum = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const categories = [
+  const isAdmin = user?.role === 'admin';
+
+  const categories = isAdmin ? [
+    { value: 'all', label: 'All', emoji: '📋', color: 'from-gray-400 to-gray-600' },
+    { value: 'question', label: 'Question', emoji: '❓', color: 'from-blue-400 to-blue-600' },
+    { value: 'discussion', label: 'Discussion', emoji: '💬', color: 'from-green-400 to-green-600' },
+    { value: 'news', label: 'News', emoji: '📈', color: 'from-purple-400 to-purple-600' },
+    { value: 'advice', label: 'Advice', emoji: '💡', color: 'from-yellow-400 to-orange-600' },
+  ] : [
     { value: 'all', label: 'تمام', emoji: '📋', color: 'from-gray-400 to-gray-600' },
     { value: 'question', label: 'سوال', emoji: '❓', color: 'from-blue-400 to-blue-600' },
     { value: 'discussion', label: 'گفتگو', emoji: '💬', color: 'from-green-400 to-green-600' },
@@ -56,50 +64,71 @@ const SimpleForum = () => {
     const diffTime = Math.abs(now - date);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'آج';
-    if (diffDays === 1) return 'کل';
-    if (diffDays < 7) return `${diffDays} دن پہلے`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} ہفتے پہلے`;
-    return `${Math.floor(diffDays / 30)} مہینے پہلے`;
+    if (isAdmin) {
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      return `${Math.floor(diffDays / 30)} months ago`;
+    } else {
+      if (diffDays === 0) return 'آج';
+      if (diffDays === 1) return 'کل';
+      if (diffDays < 7) return `${diffDays} دن پہلے`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} ہفتے پہلے`;
+      return `${Math.floor(diffDays / 30)} مہینے پہلے`;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-2xl text-gray-700 dark:text-gray-300">لوڈ ہو رہا ہے...</p>
+          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-2xl text-gray-700 dark:text-gray-300">
+            {isAdmin ? 'Loading...' : 'لوڈ ہو رہا ہے...'}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900" dir={isAdmin ? 'ltr' : 'rtl'}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 shadow-lg">
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2 mb-4 px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-all"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-lg">واپس</span>
+            {isAdmin ? (
+              <>
+                <ArrowLeft className="w-5 h-5" />
+                <span className="text-lg">Back</span>
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="w-5 h-5" />
+                <span className="text-lg">واپس</span>
+              </>
+            )}
           </button>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
                 <MessageSquare className="w-10 h-10" />
-                کاشتکاروں کا فورم
+                {isAdmin ? "Farmers' Forum" : 'کاشتکاروں کا فورم'}
               </h1>
-              <p className="text-xl opacity-90">سوالات پوچھیں اور تجربات شیئر کریں</p>
+              <p className="text-xl opacity-90">
+                {isAdmin ? 'Ask questions and share experiences' : 'سوالات پوچھیں اور تجربات شیئر کریں'}
+              </p>
             </div>
             <button
               onClick={() => navigate('/forum/create')}
-              className="px-6 py-4 bg-white text-blue-600 rounded-xl text-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
+              className="px-6 py-4 bg-white text-green-600 rounded-xl text-xl font-bold hover:shadow-lg transition-all flex items-center gap-2"
             >
               <Plus className="w-6 h-6" />
-              نیا پیغام لکھیں
+              {isAdmin ? 'Create New Post' : 'نیا پیغام لکھیں'}
             </button>
           </div>
         </div>
@@ -110,21 +139,23 @@ const SimpleForum = () => {
         {/* Search */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
           <div className="relative">
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" />
+            <Search className={`absolute ${isAdmin ? 'left-4' : 'right-4'} top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400`} />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="تلاش کریں..."
-              className="w-full pr-12 pl-6 py-4 text-xl border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              dir="rtl"
+              placeholder={isAdmin ? 'Search...' : 'تلاش کریں...'}
+              className={`w-full ${isAdmin ? 'pl-12 pr-6' : 'pr-12 pl-6'} py-4 text-xl border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white`}
+              dir={isAdmin ? 'ltr' : 'rtl'}
             />
           </div>
         </div>
 
         {/* Categories */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-          <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">اقسام</h3>
+          <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            {isAdmin ? 'Categories' : 'اقسام'}
+          </h3>
           <div className="flex gap-3 flex-wrap">
             {categories.map(cat => (
               <button
@@ -149,13 +180,13 @@ const SimpleForum = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-lg text-center">
               <MessageSquare className="w-20 h-20 text-gray-400 mx-auto mb-4" />
               <p className="text-2xl text-gray-600 dark:text-gray-400">
-                کوئی پیغام نہیں ملا
+                {isAdmin ? 'No posts found' : 'کوئی پیغام نہیں ملا'}
               </p>
               <button
                 onClick={() => navigate('/forum/create')}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xl font-bold hover:shadow-lg transition-all"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl text-xl font-bold hover:shadow-lg transition-all"
               >
-                پہلا پیغام لکھیں
+                {isAdmin ? 'Write First Post' : 'پہلا پیغام لکھیں'}
               </button>
             </div>
           ) : (
@@ -165,7 +196,7 @@ const SimpleForum = () => {
                 <div
                   key={post._id}
                   onClick={() => navigate(`/forum/${post._id}`)}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-transparent hover:border-blue-500"
+                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-transparent hover:border-green-500"
                 >
                   <div className="flex items-start gap-4">
                     {/* Category Badge */}
@@ -193,7 +224,7 @@ const SimpleForum = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <MessageCircle className="w-5 h-5" />
-                          <span>{post.comments?.length || 0} تبصرے</span>
+                          <span>{post.comments?.length || 0} {isAdmin ? 'comments' : 'تبصرے'}</span>
                         </div>
                       </div>
                     </div>

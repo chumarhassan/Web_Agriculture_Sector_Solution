@@ -158,51 +158,51 @@ const SimpleLogin = () => {
   // Farmer Login UI (Simple & Colorful with Urdu)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-800 to-green-900 p-4">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-xl">
         {/* Toggle Button */}
         <div className="flex justify-center mb-6">
           <button
-            className="px-8 py-4 bg-green-600 text-white rounded-l-2xl text-xl font-bold flex items-center gap-3"
+            className="px-6 py-3 md:px-8 md:py-4 bg-green-600 text-white rounded-l-2xl text-lg md:text-xl font-bold flex items-center gap-2 md:gap-3"
           >
-            <Tractor size={24} />
+            <Tractor size={20} className="md:w-6 md:h-6" />
             کسان لاگ ان
           </button>
           <button
             onClick={() => setLoginType('admin')}
-            className="px-8 py-4 bg-green-700 hover:bg-green-600 text-white rounded-r-2xl text-xl font-bold transition-all flex items-center gap-3"
+            className="px-6 py-3 md:px-8 md:py-4 bg-green-700 hover:bg-green-600 text-white rounded-r-2xl text-lg md:text-xl font-bold transition-all flex items-center gap-2 md:gap-3"
           >
-            <Shield size={24} />
+            <Shield size={20} className="md:w-6 md:h-6" />
             ایڈمن لاگ ان
           </button>
         </div>
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-32 h-32 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-2xl">
-            <span className="text-7xl">🌾</span>
+        <div className="text-center mb-6">
+          <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full mx-auto mb-4 md:mb-6 flex items-center justify-center shadow-2xl">
+            <span className="text-5xl md:text-7xl">🌾</span>
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4">اپنے اکاؤنٹ میں داخل ہوں</h1>
-          <p className="text-green-200 text-2xl">مارکیٹ کی قیمتیں دیکھیں</p>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 md:mb-6 px-4">اپنے اکاؤنٹ میں داخل ہوں</h1>
+          <p className="text-green-200 text-lg md:text-xl lg:text-2xl">مارکیٹ کی قیمتیں دیکھیں</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-12">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8 lg:p-12">
           {error && (
-            <div className="mb-8 p-6 bg-red-100 border-4 border-red-500 rounded-2xl text-red-700 text-center text-2xl font-bold">
+            <div className="mb-6 md:mb-8 p-4 md:p-6 bg-red-100 border-4 border-red-500 rounded-2xl text-red-700 text-center text-lg md:text-xl lg:text-2xl font-bold">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
             {/* Email */}
             <div>
-              <label className="block text-2xl font-bold mb-4 text-gray-800">ای میل</label>
+              <label className="block text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4 text-gray-800">ای میل</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-6 py-5 text-2xl border-4 border-gray-300 rounded-2xl focus:border-green-500 focus:outline-none bg-gray-50"
+                className="w-full px-4 py-3 md:px-6 md:py-4 lg:py-5 text-lg md:text-xl lg:text-2xl border-4 border-gray-300 rounded-2xl focus:border-green-500 focus:outline-none bg-gray-50 text-gray-900 placeholder-gray-500"
                 placeholder="farmer1@example.com"
                 required
                 dir="ltr"
@@ -211,13 +211,13 @@ const SimpleLogin = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-2xl font-bold mb-4 text-gray-800">پاس ورڈ</label>
+              <label className="block text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4 text-gray-800">پاس ورڈ</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-6 py-5 text-2xl border-4 border-gray-300 rounded-2xl focus:border-green-500 focus:outline-none bg-gray-50"
+                className="w-full px-4 py-3 md:px-6 md:py-4 lg:py-5 text-lg md:text-xl lg:text-2xl border-4 border-gray-300 rounded-2xl focus:border-green-500 focus:outline-none bg-gray-50 text-gray-900 placeholder-gray-500"
                 placeholder="farmer123"
                 required
                 dir="ltr"
@@ -228,20 +228,11 @@ const SimpleLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white text-3xl font-bold py-6 rounded-2xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white text-xl md:text-2xl lg:text-3xl font-bold py-4 md:py-5 lg:py-6 rounded-2xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50"
             >
               {loading ? 'براہ کرم انتظار کریں...' : 'لاگ ان کریں'}
             </button>
           </form>
-
-          {/* Demo Info */}
-          <div className="mt-10 p-8 bg-yellow-50 rounded-2xl border-4 border-yellow-400">
-            <p className="text-2xl font-bold mb-4 text-center text-yellow-800">ٹیسٹ اکاؤنٹ:</p>
-            <div className="space-y-3 text-xl text-gray-700">
-              <p className="ltr text-center"><strong>کاشتکار:</strong> farmer1@example.com / farmer123</p>
-              <p className="ltr text-center"><strong>منتظم:</strong> admin@example.com / admin123</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

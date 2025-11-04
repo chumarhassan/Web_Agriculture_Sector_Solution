@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { adminAPI, itemsAPI } from '../utils/api';
+import { adminAPI, itemsAPI, weatherAPI } from '../utils/api';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
-import WeatherMap from '../components/WeatherMap';
 import { useForm } from 'react-hook-form';
 import Papa from 'papaparse';
-import { Plus, Upload, Trash2, Edit, BarChart3 } from 'lucide-react';
+import { Plus, Upload, Trash2, Edit, BarChart3, Cloud, Thermometer, Droplets, Wind } from 'lucide-react';
 
 const AdminDashboard = () => {
   const [items, setItems] = useState([]);
@@ -18,10 +17,13 @@ const AdminDashboard = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
+  const [weatherData, setWeatherData] = useState([]);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
 
   useEffect(() => {
     fetchData();
+    fetchWeatherData();
   }, []);
 
   const fetchData = async () => {
@@ -37,6 +39,32 @@ const AdminDashboard = () => {
       console.error('Failed to fetch data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWeatherData = async () => {
+    const regions = ['Lahore', 'Karachi', 'Islamabad', 'Peshawar', 'Quetta', 'Multan', 'Faisalabad', 'Hyderabad'];
+    setWeatherLoading(true);
+    try {
+      const weatherPromises = regions.map(city => 
+        weatherAPI.getWeather(city).catch(err => ({ 
+          data: { 
+            data: { 
+              city, 
+              temperature: 'N/A', 
+              description: 'Data unavailable',
+              humidity: 'N/A',
+              windSpeed: 'N/A'
+            } 
+          } 
+        }))
+      );
+      const results = await Promise.all(weatherPromises);
+      setWeatherData(results.map(res => res.data.data));
+    } catch (error) {
+      console.error('Failed to fetch weather data:', error);
+    } finally {
+      setWeatherLoading(false);
     }
   };
 
@@ -160,7 +188,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto" dir="ltr">
         {/* Stats - Green Nature Theme Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -214,13 +242,60 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* Weather Map Visualization */}
+        {/* Regional Weather Data */}
         <div className="mb-8 bg-white rounded-2xl p-6 shadow-xl border-4 border-green-200">
           <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center gap-2">
-            <span>🗺️</span>
-            Pakistan Weather Map
+            <Cloud className="text-green-600" size={28} />
+            Regional Weather Data - Pakistan
           </h2>
-          <WeatherMap />
+          
+          {weatherLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+              <p className="text-green-700">Loading weather data...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {weatherData.map((weather, index) => (
+                <div 
+                  key={index} 
+                  className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 hover:shadow-lg transition-all"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold text-green-900">{weather.city}</h3>
+                    <Cloud className="text-green-600" size={24} />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-green-800">
+                      <Thermometer size={18} className="text-orange-500" />
+                      <span className="font-semibold text-2xl">
+                        {weather.temperature !== 'N/A' ? `${weather.temperature}°C` : 'N/A'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-green-700">
+                      <Droplets size={16} className="text-blue-500" />
+                      <span className="text-sm">
+                        Humidity: {weather.humidity !== 'N/A' ? `${weather.humidity}%` : 'N/A'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-green-700">
+                      <Wind size={16} className="text-cyan-500" />
+                      <span className="text-sm">
+                        Wind: {weather.windSpeed !== 'N/A' ? `${weather.windSpeed} km/h` : 'N/A'}
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2 pt-2 border-t border-green-200">
+                      <p className="text-sm text-green-600 capitalize">{weather.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Actions */}

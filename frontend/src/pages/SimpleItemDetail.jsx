@@ -29,14 +29,14 @@ ChartJS.register(
 const SimpleItemDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, selectedRegion } = useAuth();
   const [item, setItem] = useState(null);
   const [prices, setPrices] = useState([]);
   const [weather, setWeather] = useState(null);
   const [advice, setAdvice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
-  const [selectedRegion, setSelectedRegion] = useState(null); // Track which region data is for
+  const [displayRegion, setDisplayRegion] = useState(null); // Track which region data is for
 
   // Urdu item names
   const itemNames = {
@@ -87,12 +87,12 @@ const SimpleItemDetail = () => {
     try {
       setLoading(true);
 
-      // Determine which region to use
-      console.log('User object:', user);
+      // Use selected region from context, fallback to user region, then Lahore
+      const regionToUse = selectedRegion || user?.region || 'Lahore';
+      console.log('Selected region from context:', selectedRegion);
       console.log('User region:', user?.region);
-      const regionToUse = user?.region || 'Lahore';
       console.log('Region to use for data:', regionToUse);
-      setSelectedRegion(regionToUse);
+      setDisplayRegion(regionToUse);
 
       // Fetch item details
       const itemResponse = await itemsAPI.getById(id);
@@ -161,12 +161,19 @@ const SimpleItemDetail = () => {
         {
           label: 'قیمت (روپے)',
           data: sortedPrices.map(p => p.price),
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: 'rgb(22, 163, 74)', // green-600
+          backgroundColor: 'rgba(22, 163, 74, 0.3)', // green with more opacity
           fill: true,
           tension: 0.4,
           pointRadius: 6,
           pointHoverRadius: 8,
+          pointBackgroundColor: 'rgb(22, 163, 74)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: 'rgb(16, 185, 129)', // emerald-500
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 3,
+          borderWidth: 3, // thicker line
         }
       ]
     };
@@ -215,6 +222,10 @@ const SimpleItemDetail = () => {
           callback: function(value) {
             return value + ' روپے';
           }
+        },
+        grid: {
+          color: 'rgba(22, 163, 74, 0.1)', // light green grid
+          borderColor: 'rgba(22, 163, 74, 0.3)',
         }
       },
       x: {
@@ -222,9 +233,13 @@ const SimpleItemDetail = () => {
           font: {
             size: 14
           }
+        },
+        grid: {
+          color: 'rgba(22, 163, 74, 0.2)', // more visible green grid
+          borderColor: 'rgba(22, 163, 74, 0.5)',
         }
       }
-    }
+    },
   };
 
   if (loading) {
@@ -240,12 +255,12 @@ const SimpleItemDetail = () => {
 
   if (!item) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-3xl text-red-600 dark:text-red-400">شے نہیں ملی</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="mt-6 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xl font-bold hover:shadow-lg transition-all"
+            className="mt-6 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl text-xl font-bold hover:shadow-lg transition-all"
           >
             واپس جائیں
           </button>
@@ -271,9 +286,9 @@ const SimpleItemDetail = () => {
     : currentPrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 shadow-lg">
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => navigate('/dashboard')}
@@ -289,7 +304,7 @@ const SimpleItemDetail = () => {
             </span>
             <span className="flex items-center gap-2 px-4 py-2 bg-white bg-opacity-20 rounded-lg">
               <MapPin className="w-5 h-5" />
-              {regionNames[selectedRegion] || selectedRegion || 'لاہور'}
+              {regionNames[displayRegion] || displayRegion || 'لاہور'}
             </span>
           </div>
         </div>
@@ -337,7 +352,7 @@ const SimpleItemDetail = () => {
                 onClick={() => setDays(d)}
                 className={`px-6 py-3 rounded-xl text-lg font-bold transition-all ${
                   days === d
-                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:shadow-md'
                 }`}
               >

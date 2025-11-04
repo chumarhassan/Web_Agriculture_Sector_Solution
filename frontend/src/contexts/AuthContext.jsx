@@ -15,15 +15,21 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedRegion, setSelectedRegion] = useState(null); // Global region state
 
   useEffect(() => {
     // Check for stored auth on mount
     const storedToken = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+    const storedRegion = localStorage.getItem('selectedRegion');
     
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
+    }
+    
+    if (storedRegion) {
+      setSelectedRegion(storedRegion);
     }
     
     setLoading(false);
@@ -70,14 +76,31 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setSelectedRegion(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('selectedRegion');
+  };
+
+  const changeRegion = (region) => {
+    setSelectedRegion(region);
+    localStorage.setItem('selectedRegion', region);
   };
 
   const isAdmin = () => user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading, isAdmin }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      login, 
+      register, 
+      logout, 
+      loading, 
+      isAdmin,
+      selectedRegion,
+      changeRegion
+    }}>
       {children}
     </AuthContext.Provider>
   );

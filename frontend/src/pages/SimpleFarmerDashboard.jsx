@@ -6,7 +6,7 @@ import { MessageSquare, LogOut, MapPin, Lightbulb, TrendingUp } from 'lucide-rea
 import SimpleWeatherMap from '../components/SimpleWeatherMap';
 
 const SimpleFarmerDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, changeRegion } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +204,10 @@ const SimpleFarmerDashboard = () => {
             {Object.entries(regions).map(([eng, urdu]) => (
               <button
                 key={eng}
-                onClick={() => setRegion(eng)}
+                onClick={() => {
+                  setRegion(eng);
+                  changeRegion(eng); // Save to global context
+                }}
                 className={`px-6 py-5 text-2xl font-bold rounded-2xl transition-all ${
                   region === eng
                     ? 'bg-gradient-to-r from-green-600 to-green-500 text-white shadow-xl scale-105'
