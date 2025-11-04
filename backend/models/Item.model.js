@@ -41,7 +41,15 @@ const itemSchema = new mongoose.Schema({
 
 // Create slug from name before saving
 itemSchema.pre('save', function(next) {
-  if (this.isModified('name')) {
+  if (this.isModified('name') || !this.slug) {
+    this.slug = this.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  }
+  next();
+});
+
+// Also handle slug generation for new documents
+itemSchema.pre('validate', function(next) {
+  if (!this.slug && this.name) {
     this.slug = this.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
   }
   next();

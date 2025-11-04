@@ -5,14 +5,14 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
 
 // Pages
-import Login from './pages/Login';
+import SimpleLogin from './pages/SimpleLogin';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
-import FarmerDashboard from './pages/FarmerDashboard';
-import ItemDetail from './pages/ItemDetail';
-import Forum from './pages/Forum';
-import PostDetail from './pages/PostDetail';
-import CreatePost from './pages/CreatePost';
+import SimpleFarmerDashboard from './pages/SimpleFarmerDashboard';
+import SimpleItemDetail from './pages/SimpleItemDetail';
+import SimpleForum from './pages/SimpleForum';
+import SimplePostDetail from './pages/SimplePostDetail';
+import SimpleCreatePost from './pages/SimpleCreatePost';
 
 function App() {
   return (
@@ -21,16 +21,16 @@ function App() {
         <Router>
           <Routes>
             {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<SimpleLogin />} />
             <Route path="/register" element={<Register />} />
             
             {/* Protected Routes */}
-            <Route path="/" element={<PrivateRoute><FarmerDashboard /></PrivateRoute>} />
-            <Route path="/dashboard" element={<PrivateRoute><FarmerDashboard /></PrivateRoute>} />
-            <Route path="/items/:id" element={<PrivateRoute><ItemDetail /></PrivateRoute>} />
-            <Route path="/forum" element={<PrivateRoute><Forum /></PrivateRoute>} />
-            <Route path="/forum/:id" element={<PrivateRoute><PostDetail /></PrivateRoute>} />
-            <Route path="/forum/create" element={<PrivateRoute><CreatePost /></PrivateRoute>} />
+            <Route path="/" element={<PrivateRoute><SimpleFarmerDashboard /></PrivateRoute>} />
+            <Route path="/dashboard" element={<PrivateRoute><SimpleFarmerDashboard /></PrivateRoute>} />
+            <Route path="/items/:id" element={<PrivateRoute><SimpleItemDetail /></PrivateRoute>} />
+            <Route path="/forum" element={<PrivateRoute><SimpleForum /></PrivateRoute>} />
+            <Route path="/forum/:id" element={<PrivateRoute><SimplePostDetail /></PrivateRoute>} />
+            <Route path="/forum/create" element={<PrivateRoute><SimpleCreatePost /></PrivateRoute>} />
             
             {/* Admin Only Routes */}
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

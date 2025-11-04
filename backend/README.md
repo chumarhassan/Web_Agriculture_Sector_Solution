@@ -174,6 +174,71 @@ Parameters:
 - `region` (required): Region name
 - `days` (optional, default: 7): Number of days of history
 
+#### 🌟 Compare Multiple Items (BONUS FEATURE)
+```http
+GET /api/items/compare?itemIds=id1,id2,id3&region=Lahore&days=7
+```
+
+**Use Case:** Compare price trends of multiple vegetables (e.g., "Tomato vs. Potato")
+
+Parameters:
+- `itemIds` (required): Comma-separated item IDs (2-5 items)
+- `region` (required): Region name
+- `days` (optional, default: 7): Number of days of history
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "item": {
+          "_id": "...",
+          "name": "Tomato",
+          "category": "vegetable",
+          "unit": "kg"
+        },
+        "prices": [
+          { "date": "2025-11-01", "price": 45.50 },
+          { "date": "2025-11-02", "price": 47.20 }
+        ],
+        "stats": {
+          "min": 45.50,
+          "max": 52.00,
+          "avg": "48.35",
+          "latest": 52.00,
+          "trend": "14.29",
+          "volatility": "2.45"
+        }
+      },
+      {
+        "item": {
+          "_id": "...",
+          "name": "Potato",
+          "category": "vegetable",
+          "unit": "kg"
+        },
+        "prices": [...],
+        "stats": {...}
+      }
+    ],
+    "region": "Lahore",
+    "days": 7,
+    "insights": {
+      "bestPerformer": {
+        "name": "Tomato",
+        "trend": "14.29%"
+      },
+      "worstPerformer": {
+        "name": "Potato",
+        "trend": "-5.20%"
+      }
+    }
+  }
+}
+```
+
 ### Admin Routes (Requires Admin Role)
 
 #### Create Item

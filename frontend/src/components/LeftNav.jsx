@@ -32,10 +32,10 @@ const LeftNav = () => {
     return (
       <Link
         to={item.path}
-        className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold ${
           isActive 
-            ? 'bg-primary text-white' 
-            : 'text-muted hover:bg-background hover:text-text'
+            ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+            : 'text-green-800 hover:bg-green-100 hover:text-green-900'
         }`}
         onClick={() => setIsOpen(false)}
       >
@@ -50,7 +50,7 @@ const LeftNav = () => {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-20 left-4 z-40 p-2 bg-surface rounded-lg shadow-lg"
+        className="lg:hidden fixed top-20 left-4 z-40 p-2 bg-green-600 text-white rounded-lg shadow-lg"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -66,7 +66,7 @@ const LeftNav = () => {
       {/* Navigation */}
       <div className={`
         fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-surface border-r border-gray-700 p-6
+        w-64 bg-white border-r-4 border-green-200 p-6 shadow-xl
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>

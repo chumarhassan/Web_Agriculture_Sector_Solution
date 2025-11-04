@@ -46,7 +46,15 @@ export const authAPI = {
 export const itemsAPI = {
   getAll: (params) => api.get('/items', { params }),
   getById: (id) => api.get(`/items/${id}`),
-  getPrices: (id, params) => api.get(`/items/${id}/prices`, { params })
+  getPrices: (id, params) => api.get(`/items/${id}/prices`, { params }),
+  compare: (itemIds, region, days = 7) => 
+    api.get('/items/compare', { 
+      params: { 
+        itemIds: Array.isArray(itemIds) ? itemIds.join(',') : itemIds, 
+        region, 
+        days 
+      } 
+    })
 };
 
 // Admin API

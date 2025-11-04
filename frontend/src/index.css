@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +11,20 @@
   
   body {
     @apply antialiased;
+    font-family: 'Noto Nastaliq Urdu', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    direction: rtl; /* Right-to-left for Urdu */
+    text-align: right;
+  }
+  
+  /* English elements (numbers, dates) */
+  .ltr {
+    direction: ltr;
+    text-align: left;
+  }
+  
+  /* Larger text for farmers */
+  html {
+    font-size: 18px;
   }
 }
 

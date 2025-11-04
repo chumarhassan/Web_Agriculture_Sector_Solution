@@ -2,10 +2,7 @@ const Item = require('../models/Item.model');
 const PricePoint = require('../models/PricePoint.model');
 const axios = require('axios');
 
-/**
- * Rule-based advice engine
- * Analyzes recent prices and weather to provide farming advice
- */
+// Helper function to generate rule-based advice
 const generateRuleBasedAdvice = (item, priceData, weatherData) => {
   const advice = [];
   let confidence = 0;
@@ -18,13 +15,13 @@ const generateRuleBasedAdvice = (item, priceData, weatherData) => {
     const priceChange = ((recentPrice - oldPrice) / oldPrice) * 100;
 
     if (priceChange > 10) {
-      advice.push(`${item.name} prices are rising (+${priceChange.toFixed(1)}%). Good time to sell if you have stock.`);
+      advice.push(`${item.name} کی قیمتیں بڑھ رہی ہیں (+${priceChange.toFixed(1)}%)۔ اگر آپ کے پاس اسٹاک ہے تو فروخت کرنے کا اچھا وقت ہے۔`);
       confidence += 30;
     } else if (priceChange < -10) {
-      advice.push(`${item.name} prices are falling (${priceChange.toFixed(1)}%). Consider holding stock or diversifying.`);
+      advice.push(`${item.name} کی قیمتیں گر رہی ہیں (${priceChange.toFixed(1)}%)۔ اسٹاک رکھنے یا متنوع حکمت عملی پر غور کریں۔`);
       confidence += 25;
     } else {
-      advice.push(`${item.name} prices are stable. Market conditions are normal.`);
+      advice.push(`${item.name} کی قیمتیں مستحکم ہیں۔ مارکیٹ کی صورتحال معمول کے مطابق ہے۔`);
       confidence += 20;
     }
 
@@ -33,7 +30,7 @@ const generateRuleBasedAdvice = (item, priceData, weatherData) => {
     const volatility = prices.some(p => Math.abs(p - avgPrice) / avgPrice > 0.15);
     
     if (volatility) {
-      advice.push('High price volatility detected. Monitor market closely.');
+      advice.push('قیمتوں میں زیادہ اتار چڑھاؤ ہے۔ مارکیٹ پر قریب سے نظر رکھیں۔');
       confidence += 15;
     }
   }
@@ -42,21 +39,21 @@ const generateRuleBasedAdvice = (item, priceData, weatherData) => {
   if (weatherData) {
     if (weatherData.rain) {
       if (['vegetable', 'fruit'].includes(item.category)) {
-        advice.push('Rain forecasted. Ensure proper drainage and protect crops from excess moisture.');
+        advice.push('بارش کی پیش گوئی ہے۔ پانی کے زیادہ ہونے سے فصل کی حفاظت کریں۔');
         confidence += 20;
       }
     } else {
       if (item.category === 'vegetable') {
-        advice.push('Dry weather. Ensure adequate irrigation for vegetables.');
+        advice.push('خشک موسم۔ سبزیوں کے لئے مناسب آبپاشی یقینی بنائیں۔');
         confidence += 15;
       }
     }
 
     if (weatherData.temperature > 35) {
-      advice.push('High temperature alert. Provide shade and increase watering frequency.');
+      advice.push('درجہ حرارت زیادہ ہے۔ سایہ فراہم کریں اور پانی زیادہ دیں۔');
       confidence += 20;
     } else if (weatherData.temperature < 10) {
-      advice.push('Low temperature warning. Protect sensitive crops from cold.');
+      advice.push('درجہ حرارت کم ہے۔ حساس فصل کو سردی سے بچائیں۔');
       confidence += 20;
     }
   }
@@ -64,100 +61,33 @@ const generateRuleBasedAdvice = (item, priceData, weatherData) => {
   // Seasonal advice (simplified)
   const month = new Date().getMonth();
   if (item.category === 'vegetable' && (month >= 2 && month <= 4)) {
-    advice.push('Spring season: Good time for planting leafy vegetables.');
+    advice.push('بہار کا موسم: پتوں والی سبزیوں کی کاشت کا اچھا وقت ہے۔');
     confidence += 10;
   }
 
   return {
-    advice: advice.length > 0 ? advice : ['No specific recommendations at this time. Monitor prices and weather regularly.'],
+    advice: advice.length > 0 ? advice : ['اس وقت کوئی خاص سفارش نہیں۔ قیمتوں اور موسم کی نگرانی جاری رکھیں۔'],
     confidence: Math.min(confidence, 95) // Cap at 95%
   };
 };
 
-/**
- * Enhanced advice using OpenAI GPT (optional)
- * Falls back to rule-based if API key not configured
- */
-const generateAIAdvice = async (item, priceData, weatherData) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    return null; // Fall back to rule-based
-  }
-
-  try {
-    // Prepare context for AI
-    const priceContext = priceData.length > 0
-      ? `Recent prices: ${priceData.map(p => `${p.date.toLocaleDateString()}: $${p.price}`).join(', ')}`
-      : 'No recent price data available';
-
-    const weatherContext = weatherData
-      ? `Weather: ${weatherData.temperature}°C, ${weatherData.condition}, Humidity: ${weatherData.humidity}%`
-      : 'No weather data available';
-
-    const prompt = `You are an agricultural advisor. Based on the following data for ${item.name} (${item.category}):
-
-${priceContext}
-${weatherContext}
-
-Provide 2-3 short, actionable farming recommendations. Keep each point under 20 words. Be specific and practical.`;
-
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 150,
-        temperature: 0.7
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const aiAdvice = response.data.choices[0].message.content
-      .split('\n')
-      .filter(line => line.trim().length > 0)
-      .map(line => line.replace(/^[-•*]\s*/, '').trim());
-
-    return {
-      advice: aiAdvice,
-      confidence: 85,
-      source: 'AI'
-    };
-  } catch (error) {
-    console.error('OpenAI API error:', error.message);
-    return null; // Fall back to rule-based
-  }
-};
-
-/**
- * @route   GET /api/advice
- * @desc    Get farming advice based on item prices and weather
- * @access  Public
- * @query   itemId (required), city, region
- */
+// Main controller function
 exports.getAdvice = async (req, res, next) => {
   try {
-    const { itemId, city, region } = req.query;
+    const { itemId, region, city } = req.query;
 
-    if (!itemId) {
+    if (!itemId || !region) {
       return res.status(400).json({
         success: false,
-        data: null,
-        message: 'itemId parameter is required'
+        message: 'Item ID and region are required'
       });
     }
 
-    // Get item
+    // Get item details
     const item = await Item.findById(itemId);
     if (!item) {
       return res.status(404).json({
         success: false,
-        data: null,
         message: 'Item not found'
       });
     }
@@ -166,51 +96,37 @@ exports.getAdvice = async (req, res, next) => {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    let priceData = [];
-    if (region) {
-      priceData = await PricePoint.find({
-        item: itemId,
-        region: region,
-        date: { $gte: sevenDaysAgo }
-      }).sort({ date: 1 });
-    }
+    const priceData = await PricePoint.find({
+      item: itemId,
+      region: region,
+      date: { $gte: sevenDaysAgo }
+    }).sort({ date: 1 }).limit(10);
 
     // Get weather data
     let weatherData = null;
-    if (city) {
-      try {
-        const apiKey = process.env.OPENWEATHER_API_KEY;
-        if (apiKey) {
-          const weatherResponse = await axios.get(
-            `https://api.openweathermap.org/data/2.5/weather`,
-            {
-              params: {
-                q: city,
-                appid: apiKey,
-                units: 'metric'
-              }
-            }
-          );
-          weatherData = {
-            temperature: weatherResponse.data.main.temp,
-            condition: weatherResponse.data.weather[0].main,
-            humidity: weatherResponse.data.main.humidity,
-            rain: weatherResponse.data.weather[0].main.toLowerCase().includes('rain')
-          };
-        }
-      } catch (error) {
-        console.error('Weather fetch error:', error.message);
+    try {
+      const weatherApiKey = process.env.OPENWEATHER_API_KEY;
+      const weatherCity = city || region;
+      
+      if (weatherApiKey) {
+        const weatherResponse = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${weatherCity},PK&appid=${weatherApiKey}&units=metric`
+        );
+        
+        weatherData = {
+          temperature: weatherResponse.data.main.temp,
+          rain: weatherResponse.data.weather[0].main.toLowerCase().includes('rain'),
+          description: weatherResponse.data.weather[0].description
+        };
       }
+    } catch (weatherError) {
+      console.log('Weather API error:', weatherError.message);
     }
 
-    // Try AI advice first, fall back to rule-based
-    let adviceResult = await generateAIAdvice(item, priceData, weatherData);
-    
-    if (!adviceResult) {
-      adviceResult = generateRuleBasedAdvice(item, priceData, weatherData);
-      adviceResult.source = 'rule-based';
-    }
+    // Generate rule-based advice
+    const ruleBasedResult = generateRuleBasedAdvice(item, priceData, weatherData);
 
+    // Return response
     res.json({
       success: true,
       data: {
@@ -219,14 +135,14 @@ exports.getAdvice = async (req, res, next) => {
           name: item.name,
           category: item.category
         },
-        advice: adviceResult.advice,
-        confidence: adviceResult.confidence,
-        source: adviceResult.source,
+        advice: ruleBasedResult.advice,
+        confidence: ruleBasedResult.confidence,
+        source: 'rule-based',
         priceDataPoints: priceData.length,
-        weatherIncluded: !!weatherData
-      },
-      message: 'Advice generated successfully'
+        weatherIncluded: weatherData !== null
+      }
     });
+
   } catch (error) {
     next(error);
   }
